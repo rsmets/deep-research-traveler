@@ -11,7 +11,7 @@ import { travelAgent } from "./agents/travel-agent";
 
 export const mastra = new Mastra({
   storage: new LibSQLStore({
-    url: "file:../mastra.db",
+    url: "file:mastra-memory.db", // Use same database as travel agent
   }),
   agents: {
     researchAgent,

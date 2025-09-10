@@ -13,10 +13,10 @@ const memory = new Memory({
     new TokenLimiter(120000), // limit to 120k tokens for optimal performance
   ],
   storage: new LibSQLStore({
-    url: "file:./mastra-memory.db", // Store in project root for easy access
+    url: "file:mastra-memory.db", // Store in project root for easy access
   }),
   vector: new LibSQLVector({
-    connectionUrl: "file:./mastra-memory.db",
+    connectionUrl: "file:mastra-memory.db",
   }),
   embedder: openai.embedding("text-embedding-3-small"),
   options: {
