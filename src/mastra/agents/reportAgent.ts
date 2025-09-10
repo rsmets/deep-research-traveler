@@ -2,7 +2,7 @@ import { Agent } from "@mastra/core/agent";
 import { openai } from "@ai-sdk/openai";
 
 // Initialize model - using o3-mini as in the original implementation
-const mainModel = openai(process.env.MODEL ?? "gpt-5");
+const reportModel = openai(process.env.MODEL ?? "gpt-5");
 
 export const reportAgent = new Agent({
   name: "Report Agent",
