@@ -1,39 +1,42 @@
-import { createTool } from '@mastra/core/tools';
-import { z } from 'zod';
+import { createTool } from "@mastra/core/tools";
+import { z } from "zod";
 
 export const evaluateResultTool = createTool({
-  id: 'evaluate-result',
-  description: 'Evaluate if a search result is relevant to the research query',
+  id: "evaluate-result",
+  description: "Evaluate if a search result is relevant to the research query",
   inputSchema: z.object({
-    query: z.string().describe('The original research query'),
+    query: z.string().describe("The original research query"),
     result: z
       .object({
         title: z.string(),
         url: z.string(),
         content: z.string(),
       })
-      .describe('The search result to evaluate'),
-    existingUrls: z.array(z.string()).describe('URLs that have already been processed').optional(),
+      .describe("The search result to evaluate"),
+    existingUrls: z
+      .array(z.string())
+      .describe("URLs that have already been processed")
+      .optional(),
   }),
   execute: async ({ context, mastra }) => {
     try {
       const { query, result, existingUrls = [] } = context;
-      console.log('Evaluating result', { context });
+      console.log("Evaluating result", { context });
 
       // Check if URL already exists (only if existingUrls was provided)
       if (existingUrls && existingUrls.includes(result.url)) {
         return {
           isRelevant: false,
-          reason: 'URL already processed',
+          reason: "URL already processed",
         };
       }
 
-      const evaluationAgent = mastra!.getAgent('evaluationAgent');
+      const evaluationAgent = mastra!.getAgent("evaluationAgent");
 
-      const response = await evaluationAgent.generate(
+      const stream = await evaluationAgent.streamVNext(
         [
           {
-            role: 'user',
+            role: "user",
             content: `Evaluate whether this search result is relevant and will help answer the query: "${query}".
 
         Search result:
@@ -47,19 +50,23 @@ export const evaluateResultTool = createTool({
           },
         ],
         {
-          experimental_output: z.object({
-            isRelevant: z.boolean(),
-            reason: z.string(),
-          }),
-        },
+          structuredOutput: {
+            schema: z.object({
+              isRelevant: z.boolean(),
+              reason: z.string(),
+            }),
+          },
+        }
       );
 
-      return response.object;
+      // Wait for the stream to complete and get the structured output
+      const evaluationResult = await stream.object;
+      return evaluationResult;
     } catch (error) {
-      console.error('Error evaluating result:', error);
+      console.error("Error evaluating result:", error);
       return {
         isRelevant: false,
-        reason: 'Error in evaluation',
+        reason: "Error in evaluation",
       };
     }
   },

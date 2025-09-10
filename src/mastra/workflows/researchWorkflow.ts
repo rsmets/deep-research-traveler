@@ -1,9 +1,9 @@
-import { createWorkflow, createStep } from '@mastra/core/workflows';
-import { z } from 'zod';
+import { createWorkflow, createStep } from "@mastra/core/workflows";
+import { z } from "zod";
 
 // Step 1: Get user query
 const getUserQueryStep = createStep({
-  id: 'get-user-query',
+  id: "get-user-query",
   inputSchema: z.object({}),
   outputSchema: z.object({
     query: z.string(),
@@ -20,25 +20,25 @@ const getUserQueryStep = createStep({
     if (resumeData) {
       return {
         ...resumeData,
-        query: resumeData.query || '',
+        query: resumeData.query || "",
       };
     }
 
     await suspend({
       message: {
-        query: 'What would you like to research?',
+        query: "What would you like to research?",
       },
     });
 
     return {
-      query: '',
+      query: "",
     };
   },
 });
 
 // Step 2: Research
 const researchStep = createStep({
-  id: 'research',
+  id: "research",
   inputSchema: z.object({
     query: z.string(),
   }),
@@ -50,7 +50,7 @@ const researchStep = createStep({
     const { query } = inputData;
 
     try {
-      const agent = mastra.getAgent('researchAgent');
+      const agent = mastra.getAgent("researchAgent");
       const researchPrompt = `Research the following topic thoroughly using the two-phase process: "${query}".
 
       Phase 1: Search for 2-3 initial queries about this topic
@@ -58,42 +58,47 @@ const researchStep = createStep({
 
       Return findings in JSON format with queries, searchResults, learnings, completedQueries, and phase.`;
 
-      const result = await agent.generate(
+      const stream = await agent.streamVNext(
         [
           {
-            role: 'user',
+            role: "user",
             content: researchPrompt,
           },
         ],
         {
           maxSteps: 15,
-          experimental_output: z.object({
-            queries: z.array(z.string()),
-            searchResults: z.array(
-              z.object({
-                title: z.string(),
-                url: z.string(),
-                relevance: z.string(),
-              }),
-            ),
-            learnings: z.array(
-              z.object({
-                learning: z.string(),
-                followUpQuestions: z.array(z.string()),
-                source: z.string(),
-              }),
-            ),
-            completedQueries: z.array(z.string()),
-            phase: z.string().optional(),
-          }),
-        },
+          structuredOutput: {
+            schema: z.object({
+              queries: z.array(z.string()),
+              searchResults: z.array(
+                z.object({
+                  title: z.string(),
+                  url: z.string(),
+                  relevance: z.string(),
+                })
+              ),
+              learnings: z.array(
+                z.object({
+                  learning: z.string(),
+                  followUpQuestions: z.array(z.string()),
+                  source: z.string(),
+                })
+              ),
+              completedQueries: z.array(z.string()),
+              phase: z.string().optional(),
+            }),
+          },
+        }
       );
 
+      // Wait for the stream to complete and get the structured output
+      const result = await stream.object;
+
       // Create a summary
-      const summary = `Research completed on "${query}:" \n\n ${JSON.stringify(result.object, null, 2)}\n\n`;
+      const summary = `Research completed on "${query}:" \n\n ${JSON.stringify(result, null, 2)}\n\n`;
 
       return {
-        researchData: result.object,
+        researchData: result,
         summary,
       };
     } catch (error: any) {
@@ -108,7 +113,7 @@ const researchStep = createStep({
 
 // Step 3: Get user approval
 const approvalStep = createStep({
-  id: 'approval',
+  id: "approval",
   inputSchema: z.object({
     researchData: z.any(),
     summary: z.string(),
@@ -142,7 +147,7 @@ const approvalStep = createStep({
 
 // Define the workflow
 export const researchWorkflow = createWorkflow({
-  id: 'research-workflow',
+  id: "research-workflow",
   inputSchema: z.object({}),
   outputSchema: z.object({
     approved: z.boolean(),
@@ -151,4 +156,8 @@ export const researchWorkflow = createWorkflow({
   steps: [getUserQueryStep, researchStep, approvalStep],
 });
 
-researchWorkflow.then(getUserQueryStep).then(researchStep).then(approvalStep).commit();
+researchWorkflow
+  .then(getUserQueryStep)
+  .then(researchStep)
+  .then(approvalStep)
+  .commit();
