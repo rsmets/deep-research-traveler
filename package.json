@@ -18,20 +18,20 @@
     "node": ">=20.9.0"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.3.24",
+    "@ai-sdk/openai": "^2.0.27",
     "@mastra/core": "latest",
     "@mastra/deployer-vercel": "^0.11.22",
     "@mastra/libsql": "latest",
     "@mastra/loggers": "latest",
     "@mastra/memory": "latest",
-    "ai": "^4.3.19",
-    "exa-js": "^1.8.27",
-    "zod": "^3.25.76"
+    "ai": "^5.0.39",
+    "exa-js": "^1.9.3",
+    "zod": "^4.1.5"
   },
   "devDependencies": {
-    "@types/node": "^24.0.3",
+    "@types/node": "^24.3.1",
     "mastra": "latest",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.2",
     "vercel": "^47.0.7"
   }
 }
