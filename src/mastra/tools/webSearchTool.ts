@@ -41,56 +41,58 @@ export const webSearchTool = createTool({
       // Get the summarization agent
       const summaryAgent = mastra!.getAgent("webSummarizationAgent");
 
-      // Process each result with summarization
-      const processedResults = [];
-      for (const result of results) {
-        try {
-          // Skip if content is too short or missing
-          if (!result.text || result.text.length < 100) {
-            processedResults.push({
-              title: result.title || "",
-              url: result.url,
-              content: result.text || "No content available",
-            });
-            continue;
-          }
+      // Process all results concurrently with summarization
+      const processedResults = await Promise.all(
+        results.map(async (result) => {
+          try {
+            // Skip if content is too short or missing
+            if (!result.text || result.text.length < 100) {
+              return {
+                title: result.title || "",
+                url: result.url,
+                content: result.text || "No content available",
+              };
+            }
 
-          // Summarize the content
-          const summaryStream = await summaryAgent.streamVNext([
-            {
-              role: "user",
-              content: `Please summarize the following web content for research query: "${query}"
+            // Summarize the content concurrently
+            const summaryStream = await summaryAgent.streamVNext([
+              {
+                role: "user",
+                content: `Please summarize the following web content for research query: "${query}"
 
 Title: ${result.title || "No title"}
 URL: ${result.url}
 Content: ${result.text.substring(0, 8000)}...
 
 Provide a concise summary that captures the key information relevant to the research query.`,
-            },
-          ]);
+              },
+            ]);
 
-          // Wait for the stream to complete and get the final text
-          const summaryText = await summaryStream.text;
+            // Wait for the stream to complete and get the final text
+            const summaryText = await summaryStream.text;
 
-          processedResults.push({
-            title: result.title || "",
-            url: result.url,
-            content: summaryText,
-          });
+            console.log(
+              `Summarized content for: ${result.title || result.url}`
+            );
 
-          console.log(`Summarized content for: ${result.title || result.url}`);
-        } catch (summaryError) {
-          console.error("Error summarizing content:", summaryError);
-          // Fallback to truncated original content
-          processedResults.push({
-            title: result.title || "",
-            url: result.url,
-            content: result.text
-              ? result.text.substring(0, 500) + "..."
-              : "Content unavailable",
-          });
-        }
-      }
+            return {
+              title: result.title || "",
+              url: result.url,
+              content: summaryText,
+            };
+          } catch (summaryError) {
+            console.error("Error summarizing content:", summaryError);
+            // Fallback to truncated original content
+            return {
+              title: result.title || "",
+              url: result.url,
+              content: result.text
+                ? result.text.substring(0, 500) + "..."
+                : "Content unavailable",
+            };
+          }
+        })
+      );
 
       return {
         results: processedResults,
