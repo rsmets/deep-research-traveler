@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": ".mastra/output/index.mjs",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": ".mastra/output/index.mjs"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
