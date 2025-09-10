@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": ".mastra/output/index.mjs",
+      "src": ".vercel/output/functions/index.func/index.mjs",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": ".mastra/output/index.mjs"
+      "dest": "/.vercel/output/functions/index.func/index.mjs"
     }
   ],
   "env": {
