@@ -1,6 +1,5 @@
 import { Mastra } from "@mastra/core";
 import { LibSQLStore } from "@mastra/libsql";
-import { VercelDeployer } from "@mastra/deployer-vercel";
 import { researchWorkflow } from "./workflows/researchWorkflow";
 import { learningExtractionAgent } from "./agents/learningExtractionAgent";
 import { evaluationAgent } from "./agents/evaluationAgent";
@@ -23,5 +22,4 @@ export const mastra = new Mastra({
     travelAgent,
   },
   workflows: { generateReportWorkflow, researchWorkflow },
-  deployer: new VercelDeployer(),
 });
