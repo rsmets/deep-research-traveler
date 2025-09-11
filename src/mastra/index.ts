@@ -21,6 +21,10 @@ export const mastra = new Mastra({
   },
   workflows: { generateReportWorkflow, researchWorkflow },
   // Use in-memory storage or external database for production
+  storage: new PostgresStore({
+    connectionString:
+      process.env.DATABASE_URL || "postgresql://localhost:5432/mastra_memory",
+  }),
   logger: new PinoLogger({
     name: "Mastra",
     level: "info",
