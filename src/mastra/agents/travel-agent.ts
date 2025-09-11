@@ -1,7 +1,7 @@
 import { Agent } from "@mastra/core/agent";
 import { openai } from "@ai-sdk/openai";
 import { Memory } from "@mastra/memory";
-import { LibSQLStore, LibSQLVector } from "@mastra/libsql";
+import { PostgresStore, PgVector } from "@mastra/pg";
 import { TokenLimiter } from "@mastra/memory/processors";
 import { webSearchTool } from "../tools/webSearchTool";
 import { weatherTool } from "../tools/weather-tool";
@@ -9,99 +9,94 @@ import { weatherTool } from "../tools/weather-tool";
 // Enhanced Memory Configuration for Travel Agent
 const memory = new Memory({
   processors: [
-    // Always place TokenLimiter last to ensure proper token management
-    new TokenLimiter(120000), // limit to 120k tokens for optimal performance
+    // ref: https://mastra.ai/en/docs/memory/memory-processors
+    // Example 1: Remove all tool calls/results
+    // new ToolCallFilter(),
+
+    // always place this last
+    new TokenLimiter(120000), // limit to 120k tokens
   ],
-  storage: new LibSQLStore({
-    url: "file:./mastra-memory.db", // Store in project root for easy access
+  storage: new PostgresStore({
+    connectionString:
+      process.env.DATABASE_URL || "postgresql://localhost:5432/mastra_memory",
   }),
-  vector: new LibSQLVector({
-    connectionUrl: "file:./mastra-memory.db",
+  vector: new PgVector({
+    connectionString:
+      process.env.DATABASE_URL || "postgresql://localhost:5432/mastra_memory",
   }),
   embedder: openai.embedding("text-embedding-3-small"),
   options: {
-    // Keep last 20 messages in context for continuity
+    // Keep last 20 messages in context
     lastMessages: 20,
     // Enable semantic search to find relevant past conversations
     semanticRecall: {
-      topK: 3, // Find top 3 most relevant past conversations
+      topK: 3,
       messageRange: {
-        before: 2, // Include 2 messages before the relevant message
-        after: 1, // Include 1 message after the relevant message
+        before: 2,
+        after: 1,
       },
       scope: "resource", // Search across all threads for this user
     },
-    // Enable working memory to remember user information persistently
+    // Enable working memory to remember user information
     workingMemory: {
       enabled: true,
-      scope: "resource", // Memory persists across all user threads/sessions
-      // Template for structured user information storage
+      scope: "resource", // Memory persists across all user threads
+      // schema: userProfileSchema, // can only specify schema or template
+      // ref: https://mastra.ai/en/docs/memory/working-memory#example-multi-step-retention
       template: `
-      # USER TRAVEL PROFILE
+      # USER PROFILE
 
       ## PERSONAL INFO
       - name:
       - location:
-      - email:
 
-      ## TRAVEL PREFERENCES
-      - preferred destinations:
-      - travel style: (luxury, budget, adventure, cultural, etc.)
-      - accommodation preferences: (hotels, airbnb, hostels, etc.)
-      - transportation preferences:
-      - group size preferences:
+      ## PREFERENCES
+      - travel preferences:
+      - accommodation preferences:
+      - conversation style:
 
-      ## INTERESTS & ACTIVITIES
-      - likes: (activities, food types, attractions, etc.)
-      - dislikes: (activities, food types, places to avoid, etc.)
-      - dietary restrictions:
-      - accessibility needs:
+      ## INTERESTS
+      - likes:
+      - dislikes:
 
-      ## BOOKING PREFERENCES
-      - budget range:
-      - preferred booking platforms:
-      - timing preferences: (advance booking, last minute, etc.)
-
-      ## COMMUNICATION STYLE
-      - preferred level of detail:
-      - communication tone preference:
-
-      --- Example after user interaction ---
-      # USER TRAVEL PROFILE
+      --- After user says "My name is **Sam** and I'm from **Berlin**" ---
+      # USER PROFILE
 
       ## PERSONAL INFO
-      - name: Sarah
-      - location: New York
-      - email:
+      - name: Sam
+      - location: Berlin
 
-      ## TRAVEL PREFERENCES
-      - preferred destinations: Europe, Japan
-      - travel style: cultural, foodie
-      - accommodation preferences: boutique hotels
-      - transportation preferences: trains over flights when possible
-      - group size preferences: solo or couples
+      ## PREFERENCES
+      - travel preferences:
+      - accommodation preferences:
+      - conversation style:
 
-      ## INTERESTS & ACTIVITIES
-      - likes: street food, museums, local markets, hiking
-      - dislikes: crowded tourist traps, chain restaurants
-      - dietary restrictions: vegetarian
-      - accessibility needs:
+      ## INTERESTS
+      - likes:
+      - dislikes:
 
-      ## BOOKING PREFERENCES
-      - budget range: mid-range ($100-200/night hotels)
-      - preferred booking platforms:
-      - timing preferences: plans 2-3 months in advance
+      --- After user says "I like **street food** and I don't like **pizza**" ---
+      # USER PROFILE
 
-      ## COMMUNICATION STYLE
-      - preferred level of detail: comprehensive with options
-      - communication tone preference: friendly and informative
+      ## PERSONAL INFO
+      - name: Sam
+      - location: Berlin
+
+      ## PREFERENCES
+      - travel preferences:
+      - accommodation preferences:
+      - conversation style:
+
+      ## INTERESTS
+      - likes: street food
+      - dislikes: pizza
       `,
     },
     threads: {
       generateTitle: {
-        model: openai("gpt-5-mini"), // Use mini model for title generation to save costs
+        model: openai("gpt-4.1-nano"),
         instructions:
-          "Generate a concise, descriptive title for this travel conversation based on the main topic or destination discussed.",
+          "Generate a concise title for this conversation based on the first user message.",
       },
     },
   },
