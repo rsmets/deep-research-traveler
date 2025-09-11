@@ -1,5 +1,5 @@
 import { Mastra } from "@mastra/core";
-import { LibSQLStore } from "@mastra/libsql";
+import { PostgresStore } from "@mastra/pg";
 import { researchWorkflow } from "./workflows/researchWorkflow";
 import { learningExtractionAgent } from "./agents/learningExtractionAgent";
 import { evaluationAgent } from "./agents/evaluationAgent";
@@ -8,11 +8,9 @@ import { researchAgent } from "./agents/researchAgent";
 import { webSummarizationAgent } from "./agents/webSummarizationAgent";
 import { generateReportWorkflow } from "./workflows/generateReportWorkflow";
 import { travelAgent } from "./agents/travel-agent";
+import { PinoLogger } from "@mastra/loggers";
 
 export const mastra = new Mastra({
-  storage: new LibSQLStore({
-    url: "file:mastra-memory.db", // Use same database as travel agent
-  }),
   agents: {
     researchAgent,
     reportAgent,
@@ -22,4 +20,9 @@ export const mastra = new Mastra({
     travelAgent,
   },
   workflows: { generateReportWorkflow, researchWorkflow },
+  // Use in-memory storage or external database for production
+  logger: new PinoLogger({
+    name: "Mastra",
+    level: "info",
+  }),
 });

@@ -19,11 +19,13 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.27",
-    "@mastra/core": "latest",
+    "@mastra/core": "^0.16.1",
     "@mastra/deployer-vercel": "^0.11.22",
-    "@mastra/libsql": "latest",
-    "@mastra/loggers": "latest",
-    "@mastra/memory": "latest",
+    "@mastra/libsql": "^0.14.0",
+    "@mastra/loggers": "^0.10.11",
+    "@mastra/mcp": "^0.12.0",
+    "@mastra/memory": "^0.15.0",
+    "@mastra/pg": "^0.15.1",
     "ai": "^5.0.39",
     "exa-js": "^1.9.3",
     "zod": "^4.1.5"
