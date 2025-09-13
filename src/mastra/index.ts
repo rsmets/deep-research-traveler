@@ -1,5 +1,5 @@
 import { Mastra } from "@mastra/core";
-import { PostgresStore } from "@mastra/pg";
+import { postgresStore } from "./config/database";
 import { researchWorkflow } from "./workflows/researchWorkflow";
 import { learningExtractionAgent } from "./agents/learningExtractionAgent";
 import { evaluationAgent } from "./agents/evaluationAgent";
@@ -9,6 +9,7 @@ import { webSummarizationAgent } from "./agents/webSummarizationAgent";
 import { generateReportWorkflow } from "./workflows/generateReportWorkflow";
 import { travelAgent } from "./agents/travel-agent";
 import { PinoLogger } from "@mastra/loggers";
+import { travelAgentV4 } from "./agents/travel-agent-v4";
 
 export const mastra = new Mastra({
   agents: {
@@ -18,13 +19,11 @@ export const mastra = new Mastra({
     learningExtractionAgent,
     webSummarizationAgent,
     travelAgent,
+    travelAgentV4,
   },
   workflows: { generateReportWorkflow, researchWorkflow },
-  // Use in-memory storage or external database for production
-  storage: new PostgresStore({
-    connectionString:
-      process.env.DATABASE_URL || "postgresql://localhost:5432/mastra_memory",
-  }),
+  // Use centralized database storage to avoid duplicate connections
+  storage: postgresStore,
   logger: new PinoLogger({
     name: "Mastra",
     level: "info",

@@ -8,9 +8,9 @@ import { weatherTool } from "../tools/weather-tool";
 import { memory } from "../memory/travelAgentMemory";
 
 // Travel Agent Configuration
-export const travelAgent = new Agent({
-  name: "Travel Assistant Agent",
-  model: openai(process.env.MODEL ?? "gpt-5"),
+export const travelAgentV4 = new Agent({
+  name: "Travel Assistant Agent v4o",
+  model: openai("gpt-4o"),
   memory,
   tools: {
     webSearchTool, // Add web search tool for real-time travel information
