@@ -15,8 +15,21 @@ const arcade = new Arcade({
   apiKey: process.env.ARCADE_API_KEY,
 });
 
+console.log(`ARCADE_API_KEY: ${process.env.ARCADE_API_KEY}`);
+console.log(`SERP_API_KEY: ${process.env.SERP_API_KEY}`);
+
 // Get flights tools
 const flightsToolkit = await arcade.tools.list({ toolkit: "google_flights" });
+
+if (
+  !flightsToolkit ||
+  !flightsToolkit.items ||
+  flightsToolkit.items.length === 0
+) {
+  throw new Error(
+    "Could not find Google Flights toolkit. Please ensure your ARCADE_API_KEY and SERP_API_KEY are set correctly."
+  );
+}
 
 export const googleFlightsTools = toZodToolSet({
   tools: flightsToolkit.items,
