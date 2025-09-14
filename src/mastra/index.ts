@@ -10,16 +10,18 @@ import { generateReportWorkflow } from "./workflows/generateReportWorkflow";
 import { travelAgent } from "./agents/travel-agent";
 import { PinoLogger } from "@mastra/loggers";
 import { travelAgentV4 } from "./agents/travel-agent-v4";
+import { gmailAgent } from "./agents/gmailAgent";
 
 export const mastra = new Mastra({
   agents: {
-    researchAgent,
-    reportAgent,
-    evaluationAgent,
-    learningExtractionAgent,
-    webSummarizationAgent,
-    travelAgent,
-    travelAgentV4,
+    // researchAgent,
+    // reportAgent,
+    // evaluationAgent,
+    // learningExtractionAgent,
+    // webSummarizationAgent,
+    // travelAgent,
+    // travelAgentV4,
+    gmailAgent,
   },
   workflows: { generateReportWorkflow, researchWorkflow },
   // Use centralized database storage to avoid duplicate connections

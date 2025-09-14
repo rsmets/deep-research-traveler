@@ -11,8 +11,8 @@ export const travelAgent = new Agent({
   model: openai(process.env.MODEL ?? "gpt-4"),
   memory,
   tools: {
-    webSearchTool,
-    weatherTool,
+    // webSearchTool,
+    // weatherTool,
     ...googleFlightsTools,
   },
 
