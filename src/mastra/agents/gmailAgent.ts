@@ -1,3 +1,8 @@
+/**
+ * Copied from the official Arcade Mastra Tool example:
+ * example repo: https://github.com/ArcadeAI/arcade-ai/tree/main/examples/mastra
+ * docs: https://docs.arcade.dev/home/mastra/use-arcade-tools
+ */
 import { openai } from "@ai-sdk/openai";
 import { Arcade } from "@arcadeai/arcadejs";
 import {
