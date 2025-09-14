@@ -11,20 +11,19 @@ import {
  */
 
 // Initialize Arcade
-// const arcade = new Arcade({
-//   apiKey: process.env.ARCADE_API_KEY,
-// });
 const arcade = new Arcade();
 
 // Get flights tools
-const flightsToolkit = await arcade.tools.list({ toolkit: "GoogleFlights" });
+const flightsToolkit = await arcade.tools.list({
+  toolkit: "GoogleFlights",
+  limit: 30,
+});
 
 export const googleFlightsTools = toZodToolSet({
   tools: flightsToolkit.items,
   client: arcade,
   // This should be a unique ID for your user.
   // It's used internally by Arcade to identify the user.
-  //   userId: "deep-research-traveler-user",
-  userId: "rayjsmets@gmail.com",
+  userId: "deep-research-traveler-user",
   executeFactory: executeOrAuthorizeZodTool, // Checks if tool is authorized and executes it, or returns authorization URL if needed
 });

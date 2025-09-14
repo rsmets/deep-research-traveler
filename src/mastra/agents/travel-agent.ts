@@ -1,8 +1,5 @@
 import { Agent } from "@mastra/core/agent";
 import { openai } from "@ai-sdk/openai";
-import { Memory } from "@mastra/memory";
-import { PostgresStore, PgVector } from "@mastra/pg";
-import { TokenLimiter } from "@mastra/memory/processors";
 import { webSearchTool } from "../tools/webSearchTool";
 import { weatherTool } from "../tools/weather-tool";
 import { googleFlightsTools } from "../tools/googleFlightsTool";
@@ -11,10 +8,10 @@ import { memory } from "../memory/travelAgentMemory";
 // Travel Agent Configuration
 export const travelAgent = new Agent({
   name: "Travel Assistant Agent",
-  model: openai(process.env.MODEL ?? "gpt-5"),
+  model: openai(process.env.MODEL ?? "gpt-4"),
   memory,
   tools: {
-    webSearchTool, // Add web search tool for real-time travel information
+    webSearchTool,
     weatherTool,
     ...googleFlightsTools,
   },
