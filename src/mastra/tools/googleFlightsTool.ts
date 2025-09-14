@@ -11,15 +11,16 @@ import {
  */
 
 // Initialize Arcade
-const arcade = new Arcade({
-  apiKey: process.env.ARCADE_API_KEY,
-});
+// const arcade = new Arcade({
+//   apiKey: process.env.ARCADE_API_KEY,
+// });
+const arcade = new Arcade();
 
-console.log(`ARCADE_API_KEY: ${process.env.ARCADE_API_KEY}`);
-console.log(`SERP_API_KEY: ${process.env.SERP_API_KEY}`);
+// console.log(`ARCADE_API_KEY: ${process.env.ARCADE_API_KEY}`);
+// console.log(`SERP_API_KEY: ${process.env.SERP_API_KEY}`);
 
 // Get flights tools
-const flightsToolkit = await arcade.tools.list({ toolkit: "google_flights" });
+const flightsToolkit = await arcade.tools.list({ toolkit: "gmail" });
 
 if (
   !flightsToolkit ||
