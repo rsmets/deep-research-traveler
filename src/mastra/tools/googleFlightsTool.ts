@@ -11,13 +11,12 @@ import {
  */
 
 // Initialize Arcade
-const arcade = new Arcade();
+const arcade = new Arcade({
+  apiKey: process.env.ARCADE_API_KEY,
+});
 
 // Get flights tools
-const flightsToolkit = await arcade.tools.list({
-  toolkit: "GoogleFlights",
-  limit: 30,
-});
+const flightsToolkit = await arcade.tools.list({ toolkit: "google_flights" });
 
 export const googleFlightsTools = toZodToolSet({
   tools: flightsToolkit.items,
