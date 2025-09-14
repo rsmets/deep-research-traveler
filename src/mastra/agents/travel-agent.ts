@@ -5,6 +5,7 @@ import { PostgresStore, PgVector } from "@mastra/pg";
 import { TokenLimiter } from "@mastra/memory/processors";
 import { webSearchTool } from "../tools/webSearchTool";
 import { weatherTool } from "../tools/weather-tool";
+import { googleFlightsTools } from "../tools/googleFlightsTool";
 import { memory } from "../memory/travelAgentMemory";
 
 // Travel Agent Configuration
@@ -15,6 +16,7 @@ export const travelAgent = new Agent({
   tools: {
     webSearchTool, // Add web search tool for real-time travel information
     weatherTool,
+    ...googleFlightsTools,
   },
 
   instructions: `ROLE DEFINITION
@@ -27,6 +29,7 @@ CORE CAPABILITIES
 - Discover and recommend destinations based on user preferences, budget, and interests
 - Provide detailed information about attractions, restaurants, accommodations, and activities
 - Help plan complete itineraries with timing and logistics
+- You can search for one-way flights using the available flight search tools.
 - Remember user preferences and provide increasingly personalized recommendations
 - Extract specific location information for map integration
 - Provide travel tips, local insights, and cultural information
