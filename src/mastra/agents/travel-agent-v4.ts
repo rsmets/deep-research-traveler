@@ -6,6 +6,7 @@ import { TokenLimiter } from "@mastra/memory/processors";
 import { webSearchTool } from "../tools/webSearchTool";
 import { weatherTool } from "../tools/weather-tool";
 import { memory } from "../memory/travelAgentMemory";
+import { googleFlightsTools } from "../tools/googleFlightsTool";
 
 // Travel Agent Configuration
 export const travelAgentV4 = new Agent({
@@ -15,6 +16,7 @@ export const travelAgentV4 = new Agent({
   tools: {
     webSearchTool, // Add web search tool for real-time travel information
     weatherTool,
+    ...googleFlightsTools,
   },
 
   instructions: `ROLE DEFINITION
